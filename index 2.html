@@ -1,0 +1,45 @@
+<!doctype html><html lang="fr"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#111"><title>The Real Fashion</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#f5f5f3;color:#171717;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif}.app{max-width:900px;margin:auto;padding:14px}.hero{background:#111;color:#fff;border-radius:22px;padding:24px;margin-bottom:12px}.brand{font-size:12px;letter-spacing:2px;opacity:.6}.hero h1{margin:7px 0;font-size:28px}.nav{display:flex;gap:7px;overflow:auto;margin-bottom:12px}.nav button{white-space:nowrap;border:1px solid #ddd;background:#fff;border-radius:11px;padding:10px 13px}.nav .on{background:#111;color:#fff}.page{display:none}.page.on{display:block}.card{background:#fff;border:1px solid #e5e5e5;border-radius:17px;padding:16px;margin-bottom:12px}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px}.num{font-size:28px;font-weight:800}.muted{color:#777;font-size:13px}.field{margin:10px 0}.field label{display:block;font-weight:700;font-size:13px;margin-bottom:5px}input,textarea,select{width:100%;padding:11px;border:1px solid #ddd;border-radius:11px;background:#fff;font:inherit}textarea{min-height:130px}.btn{border:0;border-radius:11px;padding:11px 14px;font-weight:700}.primary{background:#111;color:#fff}.light{background:#eee}.danger{background:#fee;color:#900}.row{display:flex;gap:8px;flex-wrap:wrap}.idea{background:#faf8ef;border-radius:13px;padding:14px;line-height:1.5;font-size:17px}.item{border:1px solid #e5e5e5;border-radius:13px;padding:13px;margin-top:10px}.tag{display:inline-block;background:#eee;border-radius:20px;padding:4px 7px;font-size:11px;margin-right:4px}.calendar{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}.day{background:#fafafa;border:1px solid #eee;border-radius:8px;min-height:62px;padding:5px;font-size:11px}.event{background:#111;color:#fff;border-radius:5px;padding:3px;margin-top:4px;font-size:9px}footer{text-align:center;color:#888;padding:12px;font-size:12px}
+</style></head><body><div class="app">
+<div class="hero"><div class="brand">THE REAL FASHION</div><h1>Ton espace personnel 👋</h1><div style="opacity:.75">Tes idées, tes textes et ton calendrier au même endroit.</div></div>
+<div class="nav"><button class="on" onclick="show('home',this)">Accueil</button><button onclick="show('create',this)">Créer</button><button onclick="show('library',this)">Mes contenus</button><button onclick="show('calendar',this)">Calendrier</button><button onclick="show('tools',this)">Outils</button></div>
+
+<div id="home" class="page on"><div class="grid">
+<div class="card"><div class="muted">Contenus</div><div class="num" id="n">0</div></div>
+<div class="card"><div class="muted">Brouillons</div><div class="num" id="b">0</div></div>
+<div class="card"><div class="muted">Programmés</div><div class="num" id="p">0</div></div></div>
+<div class="card"><h2>💡 Idée du moment</h2><div id="idea" class="idea">Clique sur Générer.</div><button class="btn primary" onclick="gen()">Générer une idée</button></div>
+<div class="card"><h2>🚀 Créer rapidement</h2><button class="btn light" onclick="show('create',document.querySelectorAll('.nav button')[1])">Nouveau contenu</button></div></div>
+
+<div id="create" class="page"><div class="card"><h2>✍️ Nouveau contenu</h2>
+<div class="field"><label>Titre</label><input id="title" placeholder="Ex. Look africain moderne"></div>
+<div class="field"><label>Plateforme</label><select id="plat"><option>Facebook</option><option>TikTok</option><option>YouTube</option><option>Instagram</option><option>Personnel</option></select></div>
+<div class="field"><label>Type</label><select id="typ"><option>Post</option><option>Script vidéo</option><option>Short / Reel</option><option>Idée</option></select></div>
+<div class="field"><label>Contenu</label><textarea id="body" placeholder="Écris ton contenu ici..."></textarea></div>
+<div class="field"><label>Date (facultatif)</label><input id="when" type="datetime-local"></div>
+<div class="row"><button class="btn primary" onclick="save()">Enregistrer</button><button class="btn light" onclick="genEditor()">✨ Générer une idée</button></div></div></div>
+
+<div id="library" class="page"><div class="card"><h2>📚 Mes contenus</h2><input id="search" placeholder="Rechercher..." oninput="render()"><div id="list"></div></div></div>
+<div id="calendar" class="page"><div class="card"><h2>📅 Calendrier</h2><div id="cal"></div></div></div>
+<div id="tools" class="page"><div class="card"><h2>🛠️ Outils</h2><p class="muted">Tes données sont enregistrées dans ce navigateur.</p><div class="row"><button class="btn light" onclick="exportData()">Exporter</button><label class="btn light">Importer <input type="file" accept=".json" hidden onchange="importData(event)"></label><button class="btn danger" onclick="clearAll()">Tout effacer</button></div></div><div class="card"><h2>💡 Générateur</h2><div id="idea2" class="idea">Ton idée apparaîtra ici.</div><button class="btn primary" onclick="gen()">Générer</button></div></div>
+<footer>The Real Fashion • usage personnel</footer></div>
+<script>
+const K="trf_personal", ideas=["3 façons de porter une tenue africaine avec un style moderne.","3 détails qui rendent un look africain élégant.","Avant/après : transformer un look traditionnel en look moderne.","Présenter un créateur africain et expliquer son style.","Conseils pour choisir les couleurs d’une tenue africaine.","Montrer les détails d’un tissu africain et raconter son inspiration.","Une tenue, trois occasions.","Un look masculin simple, élégant et africain.","Un look féminin moderne inspiré de la culture africaine.","La créativité dans la mode africaine."];
+let d=JSON.parse(localStorage.getItem(K)||"[]");
+const $=x=>document.getElementById(x);
+function show(id,btn){document.querySelectorAll(".page").forEach(x=>x.classList.remove("on"));$(id).classList.add("on");document.querySelectorAll(".nav button").forEach(x=>x.classList.remove("on"));btn.classList.add("on");render()}
+function gen(){let x=ideas[Math.floor(Math.random()*ideas.length)];$("idea").textContent=x;$("idea2").textContent=x}
+function genEditor(){let x=ideas[Math.floor(Math.random()*ideas.length)];$("title").value="Nouvelle idée";$("body").value=x+"\n\nDévelopper cette idée : "}
+function save(){let t=$("title").value.trim(),body=$("body").value.trim();if(!t||!body)return alert("Ajoute un titre et un contenu.");d.unshift({id:Date.now(),t,body,plat:$("plat").value,typ:$("typ").value,when:$("when").value,status:$("when").value?"Programmé":"Brouillon"});localStorage.setItem(K,JSON.stringify(d));$("title").value="";$("body").value="";$("when").value="";alert("Enregistré ✅");render()}
+function remove(id){if(confirm("Supprimer ?")){d=d.filter(x=>x.id!==id);localStorage.setItem(K,JSON.stringify(d));render()}}
+function render(){ $("n").textContent=d.length;$("b").textContent=d.filter(x=>x.status==="Brouillon").length;$("p").textContent=d.filter(x=>x.status==="Programmé").length;
+let q=($("search")?.value||"").toLowerCase(),a=d.filter(x=>(x.t+x.body+x.plat).toLowerCase().includes(q));$("list").innerHTML=a.length?a.map(x=>'<div class="item"><b>'+esc(x.t)+'</b><div><span class="tag">'+esc(x.plat)+'</span><span class="tag">'+esc(x.typ)+'</span><span class="tag">'+x.status+'</span></div>'+(x.when?'<div class="muted">📅 '+new Date(x.when).toLocaleString("fr-FR")+'</div>':'')+'<p style="white-space:pre-wrap">'+esc(x.body)+'</p><button class="btn danger" onclick="remove('+x.id+')">Supprimer</button></div>').join(""):'<div class="muted" style="padding:25px;text-align:center">Aucun contenu.</div>';calendar()}
+function calendar(){let z=new Date(),y=z.getFullYear(),m=z.getMonth(),first=(new Date(y,m,1).getDay()+6)%7,days=new Date(y,m+1,0).getDate(),s=["Lun","Mar","Mer","Jeu","Ven","Sam","Dim"].map(x=>'<div class="muted" style="text-align:center">'+x+'</div>').join("");for(let i=0;i<first;i++)s+="<div></div>";for(let n=1;n<=days;n++){let e=d.filter(x=>x.when&&new Date(x.when).getFullYear()==y&&new Date(x.when).getMonth()==m&&new Date(x.when).getDate()==n);s+='<div class="day"><b>'+n+'</b>'+e.map(x=>'<div class="event">'+esc(x.t)+'</div>').join("")+'</div>'}$("cal").innerHTML='<div class="calendar">'+s+"</div>"}
+function exportData(){let a=document.createElement("a");a.href=URL.createObjectURL(new Blob([JSON.stringify(d,null,2)],{type:"application/json"}));a.download="the-real-fashion.json";a.click()}
+function importData(e){let r=new FileReader();r.onload=()=>{try{d=JSON.parse(r.result);localStorage.setItem(K,JSON.stringify(d));render();alert("Importé ✅")}catch{alert("Fichier invalide")}};r.readAsText(e.target.files[0])}
+function clearAll(){if(confirm("Tout effacer ?")){d=[];localStorage.setItem(K,"[]");render()}}
+function esc(s){return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}render();
+</script></body></html>
